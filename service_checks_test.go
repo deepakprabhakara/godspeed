@@ -114,3 +114,12 @@ func (t *TestSuite) TestServiceCheck(c *C) {
 	c.Assert(err, Not(IsNil))
 	c.Check(err.Error(), Equals, fmt.Sprintf("error sending %s service check, packet larger than 8192 (8198)", svcTitle))
 }
+
+func (t *TestSuite) BenchmarkSvcChecks(c *C) {
+	fields := make(map[string]string)
+	fields["service_check_message"] = "server on fire"
+
+	for i := 0; i < c.N; i++ {
+		t.g.ServiceCheck("testSvc", 3, fields, []string{"tag:test", "tag2:testing"})
+	}
+}
