@@ -4,7 +4,10 @@
 
 package godspeed
 
-import "strings"
+import (
+	"bytes"
+	"strings"
+)
 
 // stats names can't include :, |, or @
 var reservedReplacer = strings.NewReplacer(":", "_", "|", "_", "@", "_")
@@ -14,10 +17,6 @@ func trimReserved(s string) string {
 }
 
 var pipesReplacer = strings.NewReplacer("|", "")
-
-func removePipes(s string) string {
-	return pipesReplacer.Replace(s)
-}
 
 // function to make sure tags are unique
 func uniqueTags(gt, t []string) []string {
@@ -53,4 +52,34 @@ func uniqueTags(gt, t []string) []string {
 	// how many unique tags there were
 	// so return that slice
 	return []string(t[:len(s)])
+}
+
+func writeUniqueTags(buf *bytes.Buffer, replacer *strings.Replacer, gt, t []string) {
+	if len(gt)+len(t) > 0 {
+		buf.WriteString("|#")
+
+		// build a map to track which values we've seen
+		s := make(map[string]bool)
+
+		needsComma := false
+		for _, tags := range [][]string{gt, t} {
+			for _, v := range tags {
+				if s[v] {
+					continue
+				}
+				s[v] = true
+
+				if needsComma {
+					buf.WriteString(",")
+				} else {
+					needsComma = true
+				}
+				if replacer != nil {
+					replacer.WriteString(buf, v)
+				} else {
+					buf.WriteString(v)
+				}
+			}
+		}
+	}
 }

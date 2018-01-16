@@ -9,7 +9,6 @@ import (
 	"fmt"
 	"math/rand"
 	"strconv"
-	"strings"
 )
 
 // Send is the function for emitting the metrics to statsd
@@ -49,11 +48,7 @@ func (g *Godspeed) Send(stat, kind string, delta, sampleRate float64, tags []str
 	}
 
 	// add any provided tags to the metric
-	tags = uniqueTags(g.Tags, tags)
-	if len(tags) > 0 {
-		buffer.WriteString("|#")
-		buffer.WriteString(strings.Join(tags, ","))
-	}
+	writeUniqueTags(&buffer, nil, g.Tags, tags)
 
 	// this handles the logic for truncation
 	// if the buffer length is smaller than the max, just write it

@@ -60,15 +60,7 @@ func (g *Godspeed) Event(title, text string, fields map[string]string, tags []st
 		}
 	}
 
-	tags = uniqueTags(g.Tags, tags)
-	if len(tags) > 0 {
-		for i, v := range tags {
-			tags[i] = removePipes(v)
-		}
-
-		buf.WriteString("|#")
-		buf.WriteString(strings.Join(tags, ","))
-	}
+	writeUniqueTags(&buf, pipesReplacer, g.Tags, tags)
 
 	// this handles the logic for truncation
 	// if the buffer length is larger than the max, return an error

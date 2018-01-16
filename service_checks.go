@@ -56,15 +56,7 @@ func (g *Godspeed) ServiceCheck(name string, status int, fields map[string]strin
 		}
 	}
 
-	tags = uniqueTags(g.Tags, tags)
-
-	if len(tags) > 0 {
-		for i, v := range tags {
-			tags[i] = removePipes(v)
-		}
-		buf.WriteString("|#")
-		buf.WriteString(strings.Join(tags, ","))
-	}
+	writeUniqueTags(&buf, pipesReplacer, g.Tags, tags)
 
 	if bufLen := buf.Len(); bufLen > MaxBytes {
 		return fmt.Errorf("error sending %s service check, packet larger than %d (%d)", name, MaxBytes, bufLen)
